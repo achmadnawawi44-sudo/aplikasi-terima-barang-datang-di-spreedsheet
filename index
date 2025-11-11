@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Penerimaan Barang</title>
+  <style>
+    /* CSS tetap sama seperti sebelumnya */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+      background-color: #f5f7f9;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #4285f4;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    h2 {
+      color: #4285f4;
+      margin-top: 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .upload-area {
+      border: 2px dashed #ccc;
+      padding: 25px;
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: #fafafa;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    .upload-area:hover {
+      border-color: #4285f4;
+      background-color: #f0f7ff;
+    }
+    .upload-area p {
+      margin: 0 0 15px 0;
+      color: #666;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background-color 0.3s, transform 0.2s;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #3367d6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    button.secondary {
+      background-color: #f1f1f1;
+      color: #333;
+    }
+    button.secondary:hover {
+      background-color: #e2e2e2;
+    }
+    button.danger {
+      background-color: #f44336;
+    }
+    button.danger:hover {
+      background-color: #d32f2f;
+    }
+    button.success {
+      background-color: #4caf50;
+    }
+    button.success:hover {
+      background-color: #388e3c;
+    }
+    #loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #4285f4;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1.5s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: white;
+      font-size: 18px;
+    }
+    .file-info {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 4px;
+      border-left: 4px solid #4285f4;
+    }
+    .error-message {
+      color: #d32f2f;
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #ffebee;
+      border-radius: 4px;
+      border-left: 4px solid #d32f2f;
+    }
+    .success-message {
+      color: #388e3c;
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e8f5e9;
+      border-radius: 4px;
+      border-left: 4px solid #388e3c;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+      position: sticky;
+      top: 0;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:hover {
+      background-color: #f1f8ff;
+    }
+    input[type="text"], input[type="number"], input[type="date"] {
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus {
+      border-color: #4285f4;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+    }
+    .status-sesuai {
+      color: #4caf50;
+      font-weight: 600;
+    }
+    .status-kurang {
+      color: #ff9800;
+      font-weight: 600;
+    }
+    .status-lebih {
+      color: #f44336;
+      font-weight: 600;
+    }
+    .status-tidak-ada {
+      color: #9c27b0;
+      font-weight: 600;
+    }
+    .status-belum-diterima {
+      color: #9e9e9e;
+      font-weight: 600;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      overflow: auto;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 25px;
+      border: none;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      animation: modalopen 0.3s;
+    }
+    @keyframes modalopen {
+      from {opacity: 0; transform: translateY(-50px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .close:hover {
+      color: #333;
+    }
+    .comparison-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .summary-item {
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .summary-sesuai {
+      background-color: #e8f5e9;
+      color: #388e3c;
+    }
+    .summary-kurang {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+    .summary-lebih {
+      background-color: #ffebee;
+      color: #d32f2f;
+    }
+    .summary-tidak-ada {
+      background-color: #f3e5f5;
+      color: #7b1fa2;
+    }
+    .summary-belum-diterima {
+      background-color: #f5f5f5;
+      color: #616161;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .scan-info {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .barcode-container {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    .nama-barang-auto {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f0f7ff;
+      border: 1px solid #4285f4;
+      border-radius: 4px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+    .qty-info {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+    .qty-sesuai {
+      background-color: #e8f5e9;
+      border-color: #4caf50;
+      color: #388e3c;
+    }
+    .qty-kurang {
+      background-color: #fff3e0;
+      border-color: #ff9800;
+      color: #f57c00;
+    }
+    .qty-lebih {
+      background-color: #ffebee;
+      border-color: #f44336;
+      color: #d32f2f;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      .section {
+        padding: 15px;
+      }
+      .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 20px;
+      }
+      .action-buttons {
+        flex-direction: column;
+      }
+      button {
+        width: 100%;
+        margin-right: 0;
+      }
+      table {
+        font-size: 14px;
+      }
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Modal untuk Input Manual Surat Jalan -->
+  <div id="suratJalanModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('suratJalanModal')">&times;</span>
+      <h2>Input Surat Jalan Manual</h2>
+      <div class="form-group">
+        <label for="sjNomor">Nomor Surat Jalan:</label>
+        <input type="text" id="sjNomor" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="sjTanggal">Tanggal:</label>
+        <input type="date" id="sjTanggal" class="form-control">
+      </div>
+      <button onclick="closeModal('suratJalanModal')" class="secondary">Batal</button>
+      <button onclick="simpanSuratJalanManual()" class="success">Simpan</button>
+    </div>
+  </div>
+  
+  <!-- Modal untuk Edit Barang -->
+  <div id="editBarangModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('editBarangModal')">&times;</span>
+      <h2>Edit Barang</h2>
+      <input type="hidden" id="editIndex">
+      <div class="form-group">
+        <label for="editBarcode">Barcode:</label>
+        <input type="text" id="editBarcode" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label for="editNamaBarang">Nama Barang:</label>
+        <input type="text" id="editNamaBarang" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label for="editQty">Quantity Diterima:</label>
+        <input type="number" id="editQty" class="form-control" min="1" value="1">
+      </div>
+      <button onclick="closeModal('editBarangModal')" class="secondary">Batal</button>
+      <button onclick="simpanEdit()" class="success">Simpan Perubahan</button>
+    </div>
+  </div>
+  
+  <div id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Memproses data...</div>
+  </div>
+  
+  <div class="container">
+    <div class="header">
+      <h1>Sistem Penerimaan Barang</h1>
+      <p>Sistem untuk membandingkan barang yang diterima dengan surat jalan Property Of Ahmad Nawawi</p>
+    </div>
+    
+    <div class="section">
+      <h2>Upload Surat Jalan (Format CSV)</h2>
+      <div class="upload-area" id="suratJalanDropArea">
+        <p>Seret file CSV surat jalan ke sini atau klik untuk memilih</p>
+        <input type="file" id="suratJalanFile" accept=".csv" style="display: none;">
+        <button onclick="document.getElementById('suratJalanFile').click()">Pilih File</button>
+        <div class="file-info" id="suratJalanInfo"></div>
+      </div>
+      <button id="uploadSuratJalanBtn" onclick="uploadSuratJalan()" disabled>Upload Surat Jalan</button>
+      <button onclick="openModal('suratJalanModal')" class="secondary">Input Surat Jalan</button>
+      <div id="suratJalanStatus"></div>
+    </div>
+    
+    <div class="section">
+      <h2>Upload Data Barang</h2>
+      <div class="upload-area" id="barangDropArea">
+        <p>Seret file data barang ke sini atau klik untuk memilih</p>
+        <input type="file" id="barangFile" accept=".csv,.xlsx,.xls" style="display: none;">
+        <button onclick="document.getElementById('barangFile').click()">Pilih File</button>
+        <div class="file-info" id="barangInfo"></div>
+      </div>
+      <button id="uploadBarangBtn" onclick="uploadDataBarang()" disabled>Upload Data Barang</button>
+      <div id="barangStatus"></div>
+    </div>
+    
+    <div class="section">
+      <h2>Input Barang Manual</h2>
+      <div class="form-group">
+        <label for="barcode">Barcode:</label>
+        <input type="text" id="barcode" placeholder="Scan barcode atau ketik manual" autocomplete="off">
+      </div>
+      
+      <div class="form-group">
+        <label>Nama Barang:</label>
+        <div id="namaBarangAuto" class="nama-barang-auto">-</div>
+      </div>
+      
+      <!-- TAMBAHAN: Menampilkan Qty dari Surat Jalan -->
+      <div class="form-group">
+        <label>Quantity Surat Jalan:</label>
+        <div id="qtySuratJalanInfo" class="qty-info">-</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="qty">Quantity Diterima:</label>
+        <input type="number" id="qty" min="1" value="1">
+      </div>
+      <button onclick="tambahBarang()">Tambah Barang</button>
+    </div>
+    
+    <div class="section">
+      <h2>Daftar Barang yang Diterima</h2>
+      <table id="tabelBarang">
+        <thead>
+          <tr>
+            <th>Barcode</th>
+            <th>Nama Barang</th>
+            <th>Qty Diterima</th>
+            <th>Qty Surat Jalan</th>
+            <th>Selisih</th>
+            <th>Status</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabelBarangBody">
+        </tbody>
+      </table>
+      <div class="action-buttons">
+        <button onclick="bandingkanDenganSuratJalan()">Bandingkan dengan Surat Jalan</button>
+        <button onclick="simpanData()" class="success">Simpan ke Spreadsheet</button>
+        <button onclick="resetData()" class="danger">Reset Data</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Hasil Perbandingan</h2>
+      <div id="hasilPerbandingan"></div>
+    </div>
+  </div>
+
+  <script>
+    // Variabel global untuk menyimpan data
+    let suratJalanFile = null;
+    let barangFile = null;
+    let suratJalanData = null;
+    let barangData = [];
+    let barangDiterima = [];
+    let nomorSuratJalan = '';
+    
+    // Event listeners untuk file inputs
+    document.getElementById('suratJalanFile').addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        suratJalanFile = e.target.files[0];
+        document.getElementById('suratJalanInfo').innerHTML = 
+          `File terpilih: <strong>${suratJalanFile.name}</strong> (${formatFileSize(suratJalanFile.size)})`;
+        document.getElementById('uploadSuratJalanBtn').disabled = false;
+      }
+    });
+    
+    document.getElementById('barangFile').addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        barangFile = e.target.files[0];
+        document.getElementById('barangInfo').innerHTML = 
+          `File terpilih: <strong>${barangFile.name}</strong> (${formatFileSize(barangFile.size)})`;
+        document.getElementById('uploadBarangBtn').disabled = false;
+      }
+    });
+    
+    // Event listener untuk input barcode - DIPERBAIKI
+    document.getElementById('barcode').addEventListener('input', function() {
+      const barcode = this.value.trim();
+      const namaBarangAuto = document.getElementById('namaBarangAuto');
+      const qtySuratJalanInfo = document.getElementById('qtySuratJalanInfo');
+      
+      // Reset tampilan
+      namaBarangAuto.textContent = '-';
+      namaBarangAuto.style.color = '#666';
+      qtySuratJalanInfo.textContent = '-';
+      qtySuratJalanInfo.className = 'qty-info';
+      
+      if (barcode && barangData.length > 0) {
+        // Cari barang berdasarkan barcode
+        const barang = barangData.find(item => item.barcode.toLowerCase() === barcode.toLowerCase());
+        
+        if (barang) {
+          namaBarangAuto.textContent = barang.nama;
+          namaBarangAuto.style.color = '#4285f4';
+          
+          // Cari quantity dari surat jalan berdasarkan nama barang
+          if (suratJalanData && suratJalanData.length > 0) {
+            const barangSJ = suratJalanData.find(sj => 
+              sj.nama.toLowerCase() === barang.nama.toLowerCase()
+            );
+            
+            if (barangSJ) {
+              const qtySJ = parseInt(barangSJ.qty) || 0;
+              qtySuratJalanInfo.textContent = qtySJ;
+              
+              // Beri warna berdasarkan perbandingan dengan input quantity
+              const qtyDiterima = parseInt(document.getElementById('qty').value) || 1;
+              
+              if (qtyDiterima === qtySJ) {
+                qtySuratJalanInfo.className = 'qty-info qty-sesuai';
+              } else if (qtyDiterima < qtySJ) {
+                qtySuratJalanInfo.className = 'qty-info qty-kurang';
+              } else {
+                qtySuratJalanInfo.className = 'qty-info qty-lebih';
+              }
+            } else {
+              qtySuratJalanInfo.textContent = 'Tidak ada di surat jalan';
+              qtySuratJalanInfo.className = 'qty-info';
+            }
+          } else {
+            qtySuratJalanInfo.textContent = 'Surat jalan belum diupload';
+            qtySuratJalanInfo.className = 'qty-info';
+          }
+        } else {
+          namaBarangAuto.textContent = 'Barang tidak ditemukan';
+          namaBarangAuto.style.color = '#d32f2f';
+        }
+      }
+    });
+    
+    // Event listener untuk input quantity - DITAMBAHKAN
+    document.getElementById('qty').addEventListener('input', function() {
+      // Trigger ulang perhitungan saat quantity berubah
+      document.getElementById('barcode').dispatchEvent(new Event('input'));
+    });
+    
+    // Setup drag and drop untuk area upload
+    setupDragAndDrop('suratJalanDropArea', 'suratJalanFile', 'suratJalanInfo', 'uploadSuratJalanBtn');
+    setupDragAndDrop('barangDropArea', 'barangFile', 'barangInfo', 'uploadBarangBtn');
+    
+    // Fungsi untuk menampilkan ukuran file
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Fungsi untuk setup drag and drop
+    function setupDragAndDrop(dropAreaId, fileInputId, infoId, buttonId) {
+      const dropArea = document.getElementById(dropAreaId);
+      const fileInput = document.getElementById(fileInputId);
+      const infoElement = document.getElementById(infoId);
+      const buttonElement = document.getElementById(buttonId);
+      
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+      });
+      
+      function highlight() {
+        dropArea.style.borderColor = '#4285f4';
+        dropArea.style.backgroundColor = '#e3f2fd';
+      }
+      
+      function unhighlight() {
+        dropArea.style.borderColor = '#ccc';
+        dropArea.style.backgroundColor = '#fafafa';
+      }
+      
+      dropArea.addEventListener('drop', handleDrop, false);
+      
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+          fileInput.files = files;
+          
+          if (fileInputId === 'suratJalanFile') {
+            suratJalanFile = files[0];
+          } else {
+            barangFile = files[0];
+          }
+          
+          infoElement.innerHTML = 
+            `File terpilih: <strong>${files[0].name}</strong> (${formatFileSize(files[0].size)})`;
+          buttonElement.disabled = false;
+          
+          // Trigger change event manually
+          const event = new Event('change');
+          fileInput.dispatchEvent(event);
+        }
+      }
+    }
+    
+    // Fungsi untuk upload surat jalan
+    function uploadSuratJalan() {
+      if (!suratJalanFile) {
+        showError('suratJalanStatus', 'Pilih file terlebih dahulu');
+        return;
+      }
+      
+      showLoading();
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const fileContent = e.target.result;
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+            hideLoading();
+            if (response.success) {
+              showSuccess('suratJalanStatus', response.message);
+              document.getElementById('suratJalanInfo').innerHTML += 
+                `<br>${response.data.length} item ditemukan`;
+              suratJalanData = response.data;
+              nomorSuratJalan = response.nomorSuratJalan;
+              
+              // Update tampilan jika ada input barcode aktif
+              const barcodeInput = document.getElementById('barcode');
+              if (barcodeInput.value.trim()) {
+                barcodeInput.dispatchEvent(new Event('input'));
+              }
+            } else {
+              showError('suratJalanStatus', response.message);
+            }
+          })
+          .withFailureHandler(function(error) {
+            hideLoading();
+            showError('suratJalanStatus', 'Error: ' + error.message);
+          })
+          .prosesSuratJalan(fileContent, suratJalanFile.name);
+      };
+      
+      reader.onerror = function() {
+        hideLoading();
+        showError('suratJalanStatus', 'Gagal membaca file');
+      };
+      
+      reader.readAsDataURL(suratJalanFile);
+    }
+    
+    // Fungsi untuk upload data barang
+    function uploadDataBarang() {
+      if (!barangFile) {
+        showError('barangStatus', 'Pilih file terlebih dahulu');
+        return;
+      }
+      
+      showLoading();
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        const fileContent = e.target.result;
+        
+        google.script.run
+          .withSuccessHandler(function(response) {
+            hideLoading();
+            if (response.success) {
+              showSuccess('barangStatus', response.message);
+              document.getElementById('barangInfo').innerHTML += 
+                `<br>${response.data.length} item diproses`;
+              barangData = response.data;
+              
+              // Update tampilan jika ada input barcode aktif
+              const barcodeInput = document.getElementById('barcode');
+              if (barcodeInput.value.trim()) {
+                barcodeInput.dispatchEvent(new Event('input'));
+              }
+            } else {
+              showError('barangStatus', response.message);
+            }
+          })
+          .withFailureHandler(function(error) {
+            hideLoading();
+            showError('barangStatus', 'Error: ' + error.message);
+          })
+          .prosesDataBarang(fileContent, barangFile.name);
+      };
+      
+      reader.onerror = function() {
+        hideLoading();
+        showError('barangStatus', 'Gagal membaca file');
+      };
+      
+      reader.readAsDataURL(barangFile);
+    }
+    
+    // Fungsi untuk menambahkan barang ke tabel - DIPERBAIKI
+    function tambahBarang() {
+      const barcode = document.getElementById('barcode').value.trim();
+      const namaBarangAuto = document.getElementById('namaBarangAuto').textContent;
+      const qty = parseInt(document.getElementById('qty').value);
+      const qtySuratJalanText = document.getElementById('qtySuratJalanInfo').textContent;
+      
+      if (!barcode || namaBarangAuto === '-' || namaBarangAuto === 'Barang tidak ditemukan' || isNaN(qty) || qty <= 0) {
+        alert('Isi semua field dengan benar atau pastikan barcode valid');
+        return;
+      }
+      
+      // Ambil qty surat jalan
+      let qtySuratJalan = 0;
+      if (qtySuratJalanText !== '-' && qtySuratJalanText !== 'Tidak ada di surat jalan' && qtySuratJalanText !== 'Surat jalan belum diupload') {
+        qtySuratJalan = parseInt(qtySuratJalanText) || 0;
+      }
+      
+      // Cek apakah barang dengan nama yang sama sudah ada di list (meskipun barcode berbeda)
+      const existingIndex = barangDiterima.findIndex(item => 
+        item.nama.toLowerCase() === namaBarangAuto.toLowerCase()
+      );
+      
+      if (existingIndex >= 0) {
+        // Update qty jika barang dengan nama yang sama sudah ada
+        barangDiterima[existingIndex].qtyDiterima += qty;
+        barangDiterima[existingIndex].selisih = barangDiterima[existingIndex].qtyDiterima - qtySuratJalan;
+        
+        // Tambahkan barcode baru ke daftar barcode jika berbeda
+        if (!barangDiterima[existingIndex].barcodes.includes(barcode)) {
+          barangDiterima[existingIndex].barcodes.push(barcode);
+          barangDiterima[existingIndex].barcode = barangDiterima[existingIndex].barcodes.join(', ');
+        }
+        
+        // Update status
+        updateStatusBarang(existingIndex);
+      } else {
+        // Hitung selisih
+        const selisih = qty - qtySuratJalan;
+        
+        // Tentukan status awal
+        let status = 'Belum dibandingkan';
+        if (qtySuratJalan > 0) {
+          if (qty === qtySuratJalan) {
+            status = 'Sesuai';
+          } else if (qty < qtySuratJalan) {
+            status = 'Barang Kurang';
+          } else {
+            status = 'Barang Lebih';
+          }
+        } else if (qtySuratJalan === 0 && qty > 0) {
+          status = 'Tidak ada di surat jalan';
+        }
+        
+        // Tambahkan barang baru
+        barangDiterima.push({
+          barcode: barcode,
+          barcodes: [barcode],
+          nama: namaBarangAuto,
+          qtyDiterima: qty,
+          qtySuratJalan: qtySuratJalan,
+          selisih: selisih,
+          status: status
+        });
+      }
+      
+      // Update tabel
+      updateTabelBarang();
+      
+      // Reset input
+      document.getElementById('barcode').value = '';
+      document.getElementById('namaBarangAuto').textContent = '-';
+      document.getElementById('namaBarangAuto').style.color = '#666';
+      document.getElementById('qtySuratJalanInfo').textContent = '-';
+      document.getElementById('qtySuratJalanInfo').className = 'qty-info';
+      document.getElementById('qty').value = '1';
+      document.getElementById('barcode').focus();
+    }
+    
+    // Fungsi untuk menghapus barang dari tabel
+    function hapusBarang(index) {
+      if (confirm("Apakah Anda yakin ingin menghapus barang ini?")) {
+        barangDiterima.splice(index, 1);
+        updateTabelBarang();
+      }
+    }
+    
+    // Fungsi untuk membuka modal edit
+    function editBarang(index) {
+      const barang = barangDiterima[index];
+      document.getElementById('editIndex').value = index;
+      document.getElementById('editBarcode').value = barang.barcode;
+      document.getElementById('editNamaBarang').value = barang.nama;
+      document.getElementById('editQty').value = barang.qtyDiterima;
+      
+      // Tampilkan modal
+      openModal('editBarangModal');
+    }
+    
+    // Fungsi untuk menyimpan hasil edit
+    function simpanEdit() {
+      const index = document.getElementById('editIndex').value;
+      const qty = parseInt(document.getElementById('editQty').value);
+      
+      if (isNaN(qty) || qty <= 0) {
+        alert('Masukkan quantity yang valid');
+        return;
+      }
+      
+      barangDiterima[index].qtyDiterima = qty;
+      
+      // Hitung ulang selisih
+      barangDiterima[index].selisih = qty - barangDiterima[index].qtySuratJalan;
+      
+      // Update status
+      updateStatusBarang(index);
+      
+      updateTabelBarang();
+      closeModal('editBarangModal');
+    }
+    
+    // Fungsi untuk update status barang setelah edit - DIPERBAIKI
+    function updateStatusBarang(index) {
+      const barang = barangDiterima[index];
+      
+      if (barang.qtySuratJalan === 0) {
+        barang.status = 'Tidak ada di surat jalan';
+      } else if (barang.qtyDiterima === barang.qtySuratJalan) {
+        barang.status = 'Sesuai';
+      } else if (barang.qtyDiterima < barang.qtySuratJalan) {
+        barang.status = 'Barang Kurang';
+      } else {
+        barang.status = 'Barang Lebih';
+      }
+    }
+    
+    // Fungsi untuk update tabel barang
+    function updateTabelBarang() {
+      const tbody = document.getElementById('tabelBarangBody');
+      tbody.innerHTML = '';
+      
+      barangDiterima.forEach((item, index) => {
+        const row = document.createElement('tr');
+        
+        // Tentukan class selisih berdasarkan nilai
+        let selisihClass = '';
+        if (item.selisih > 0) {
+          selisihClass = 'status-lebih';
+        } else if (item.selisih < 0) {
+          selisihClass = 'status-kurang';
+        } else {
+          selisihClass = 'status-sesuai';
+        }
+        
+        // Tentukan class status
+        let statusClass = '';
+        if (item.status === 'Sesuai') {
+          statusClass = 'status-sesuai';
+        } else if (item.status === 'Barang Kurang') {
+          statusClass = 'status-kurang';
+        } else if (item.status === 'Barang Lebih') {
+          statusClass = 'status-lebih';
+        } else if (item.status === 'Tidak ada di surat jalan') {
+          statusClass = 'status-tidak-ada';
+        } else if (item.status === 'Belum diterima') {
+          statusClass = 'status-belum-diterima';
+        } else {
+          statusClass = 'status-belum-diterima';
+        }
+        
+        row.innerHTML = `
+          <td>${item.barcode}</td>
+          <td>${item.nama}</td>
+          <td>${item.qtyDiterima}</td>
+          <td>${item.qtySuratJalan}</td>
+          <td class="${selisihClass}">${item.selisih}</td>
+          <td class="${statusClass}">${item.status}</td>
+          <td>
+            <button onclick="editBarang(${index})" class="secondary">Edit</button>
+            <button onclick="hapusBarang(${index})" class="danger">Hapus</button>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    // Fungsi untuk membandingkan dengan surat jalan berdasarkan NAMA BARANG
+    function bandingkanDenganSuratJalan() {
+      if (!suratJalanData || suratJalanData.length === 0) {
+        alert('Upload surat jalan terlebih dahulu');
+        return;
+      }
+      
+      if (barangDiterima.length === 0) {
+        alert('Tidak ada barang yang diterima');
+        return;
+      }
+      
+      showLoading();
+      
+      // Bandingkan dengan data surat jalan berdasarkan NAMA BARANG
+      barangDiterima.forEach(item => {
+        // Cari barang di surat jalan dengan nama yang sama (case insensitive)
+        const barangSJ = suratJalanData.find(sj => 
+          sj.nama.toLowerCase() === item.nama.toLowerCase()
+        );
+        
+        if (barangSJ) {
+          item.qtySuratJalan = parseInt(barangSJ.qty) || 0;
+          item.selisih = item.qtyDiterima - item.qtySuratJalan;
+          
+          if (item.qtyDiterima === item.qtySuratJalan) {
+            item.status = 'Sesuai';
+          } else if (item.qtyDiterima < item.qtySuratJalan) {
+            item.status = 'Barang Kurang';
+          } else {
+            item.status = 'Barang Lebih';
+          }
+        } else {
+          item.qtySuratJalan = 0;
+          item.selisih = item.qtyDiterima;
+          item.status = 'Tidak ada di surat jalan';
+        }
+      });
+      
+      // Cek barang di surat jalan yang belum diterima (berdasarkan NAMA BARANG)
+      suratJalanData.forEach(sj => {
+        const sudahDiterima = barangDiterima.some(item => 
+          item.nama.toLowerCase() === sj.nama.toLowerCase()
+        );
+        
+        if (!sudahDiterima) {
+          barangDiterima.push({
+            barcode: sj.barcode || '-',
+            barcodes: [sj.barcode || '-'],
+            nama: sj.nama,
+            qtyDiterima: 0,
+            qtySuratJalan: parseInt(sj.qty) || 0,
+            selisih: -parseInt(sj.qty) || 0,
+            status: 'Belum diterima'
+          });
+        }
+      });
+      
+      hideLoading();
+      updateTabelBarang();
+      
+      // Tampilkan ringkasan hasil perbandingan
+      tampilkanRingkasanPerbandingan();
+    }
+    
+    // Fungsi untuk menampilkan ringkasan perbandingan
+    function tampilkanRingkasanPerbandingan() {
+      const sesuai = barangDiterima.filter(item => item.status === 'Sesuai').length;
+      const kurang = barangDiterima.filter(item => item.status === 'Barang Kurang').length;
+      const lebih = barangDiterima.filter(item => item.status === 'Barang Lebih').length;
+      const tidakAda = barangDiterima.filter(item => item.status === 'Tidak ada di surat jalan').length;
+      const belumDiterima = barangDiterima.filter(item => item.status === 'Belum diterima').length;
+      
+      document.getElementById('hasilPerbandingan').innerHTML = `
+        <h3>Ringkasan Hasil Perbandingan:</h3>
+        <div class="comparison-summary">
+          <div class="summary-item summary-sesuai">
+            <h4>Sesuai</h4>
+            <p>${sesuai} item</p>
+          </div>
+          <div class="summary-item summary-kurang">
+            <h4>Barang Kurang</h4>
+            <p>${kurang} item</p>
+          </div>
+          <div class="summary-item summary-lebih">
+            <h4>Barang Lebih</h4>
+            <p>${lebih} item</p>
+          </div>
+          <div class="summary-item summary-tidak-ada">
+            <h4>Tidak ada di SJ</h4>
+            <p>${tidakAda} item</p>
+          </div>
+          ${belumDiterima > 0 ? `
+          <div class="summary-item summary-belum-diterima">
+            <h4>Belum Diterima</h4>
+            <p>${belumDiterima} item</p>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+    
+    // Fungsi untuk menyimpan data ke spreadsheet
+    function simpanData() {
+      if (barangDiterima.length === 0) {
+        alert('Tidak ada data yang akan disimpan');
+        return;
+      }
+      
+      if (!nomorSuratJalan) {
+        openModal('suratJalanModal');
+        return;
+      }
+      
+      showLoading();
+      
+      google.script.run
+        .withSuccessHandler(function(response) {
+          hideLoading();
+          if (response.success) {
+            alert('Data berhasil disimpan ke spreadsheet');
+            // Reset data setelah disimpan
+            resetData();
+          } else {
+            alert(response.message);
+          }
+        })
+        .withFailureHandler(function(error) {
+          hideLoading();
+          alert('Error: ' + error.message);
+        })
+        .simpanKeSpreadsheet(nomorSuratJalan, barangDiterima);
+    }
+    
+    // Fungsi untuk reset data
+    function resetData() {
+      barangDiterima = [];
+      updateTabelBarang();
+      document.getElementById('hasilPerbandingan').innerHTML = '';
+      document.getElementById('barcode').value = '';
+      document.getElementById('namaBarangAuto').textContent = '-';
+      document.getElementById('namaBarangAuto').style.color = '#666';
+      document.getElementById('qtySuratJalanInfo').textContent = '-';
+      document.getElementById('qtySuratJalanInfo').className = 'qty-info';
+      document.getElementById('qty').value = '1';
+    }
+    
+    // Fungsi untuk membuka modal
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+    }
+    
+    // Fungsi untuk menutup modal
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // Fungsi untuk menyimpan surat jalan manual
+    function simpanSuratJalanManual() {
+      const nomor = document.getElementById('sjNomor').value.trim();
+      const tanggal = document.getElementById('sjTanggal').value;
+      
+      if (!nomor || !tanggal) {
+        alert('Isi semua field dengan benar');
+        return;
+      }
+      
+      nomorSuratJalan = nomor;
+      closeModal('suratJalanModal');
+      showSuccess('suratJalanStatus', `Surat jalan manual disimpan: ${nomor} - ${tanggal}`);
+    }
+    
+    // Fungsi bantuan untuk menampilkan pesan
+    function showError(elementId, message) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `<div class="error-message">${message}</div>`;
+    }
+    
+    function showSuccess(elementId, message) {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `<div class="success-message">${message}</div>`;
+    }
+    
+    function showLoading() {
+      document.getElementById('loading').style.display = 'flex';
+    }
+    
+    function hideLoading() {
+      document.getElementById('loading').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
